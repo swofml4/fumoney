@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Correlation collection:</strong>
+  <%= @correlation.correlation_collection %>
+</p>
+
+<p>
+  <strong>Asset type1:</strong>
+  <%= @correlation.asset_type1 %>
+</p>
+
+<p>
+  <strong>Asset type2:</strong>
+  <%= @correlation.asset_type2 %>
+</p>
+
+<%= link_to 'Edit', edit_correlation_path(@correlation) %> |
+<%= link_to 'Back', correlations_path %>

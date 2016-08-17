@@ -1,0 +1,33 @@
+<p id="notice"><%= notice %></p>
+<%= form_for(@simulation, url: '/simulations/results') do |f| %>
+  	<%= options = options_from_collection_for_select(@simulations, 'id', 'title') %>
+	<%= f.select :id,  options %>
+  <div class="actions">
+    <%= f.submit "Create Simulation Graph" %>
+  </div>
+<% end %>
+
+<% if !@rngchart.nil? %>
+	<blockquote>
+		<h3>Simulation Settings</h3>
+		<h4>Starting Assets</h4>
+		<% @simulation.starting_assets.each do |starting_asset| %>
+			<%= starting_asset.asset_type.name + ': $' + number_with_delimiter(starting_asset.amount) %> &emsp;
+		<% end %>
+		<h4>Key Ages</h4>
+			<%= 'Starting Age: ' + @simulation.starting_age.to_s %> &emsp;
+			<%= 'Retirement Age: ' + @simulation.retirement_age.to_s %>
+		<h4>Contributions</h4>
+			<%= 'Initial Annual Contribution: $' + number_with_delimiter(@simulation.annual_contribution) %> &emsp;
+			<%= 'Contribution Growth: ' + @simulation.contribution_growth.to_s + '%' %>
+		<h4>Retirement</h4>
+			<%= 'Initial Annual Retirement Draw at Age ' + @simulation.retirement_age.to_s + ': $' +number_with_delimiter(@simulation.retirement_draw) %> &emsp;
+			<%= 'Retirement Draw Growth: ' + @simulation.retirement_draw_growth.to_s + '%' %> &emsp;
+			<%= 'Risk of Ruin (run out of money): ' + @ruin_chance.to_s + '%' %>
+		<h4>Other Settings</h4>
+			<%= 'Number of Trials: ' + @simulation.number_of_paths.to_s %> &emsp;
+	</blockquote>
+	<hr>
+	<%= high_chart("my_id6", @rngchart)  %>
+	<p>The gray lines are individual trials. These do not have pop up values to prevent the graph from being unusably messy.</p>
+<% end %>

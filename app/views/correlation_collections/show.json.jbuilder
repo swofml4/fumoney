@@ -1,0 +1,1 @@
+json.partial! "correlation_collections/correlation_collection", correlation_collection: @correlation_collection

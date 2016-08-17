@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%= csrf_meta_tags %>
+
+  
+	</head>
+
+
+</head>
+<body>
+	<div class="container">
+		<div class="header">
+			
+			<div class="header-img">
+				<%= image_tag("Money.png") %>
+			</div>
+			<h1 class="header-heading">FU Money</h1>
+		</div>
+		<div class="nav-bar">
+			<ul class="nav">
+				<li><%= link_to 'New Sim', root_path %></li>
+                <li><%= link_to 'View Results', controller: 'simulations', action: 'results' %></li>
+                <li><%= link_to 'Asset Types', controller: 'asset_types' %></li>
+                <li><%= link_to 'Corr Collection', controller: 'correlation_collections' %></li>
+                <li><%= link_to 'Manage Sims', simulations_manage_path %></li>
+                <li><%= link_to 'External Sources', simulations_sources_path %></li>
+                <li><%= link_to 'Matrix Test', simulations_matrix_test_path %></li>
+			</ul>
+		</div>
+		<div class="content">
+			<div class="main">
+ 	 			
+
+<%= yield %>
+
+            </div>
+        </div>
+        <div class="footer">
+	    	&copy; 2016 Michael Swofford
+	    </div>
+    </div>
+
+           
+
+</body>
+</html>

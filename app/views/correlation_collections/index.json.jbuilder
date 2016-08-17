@@ -1,0 +1,1 @@
+json.array! @correlation_collections, partial: 'correlation_collections/correlation_collection', as: :correlation_collection

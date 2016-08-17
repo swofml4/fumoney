@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @asset_type.name %>
+</p>
+
+<p>
+  <strong>Historical std deviation:</strong>
+  <%= @asset_type.historical_std_deviation %>
+</p>
+
+<p>
+  <strong>Historical average return:</strong>
+  <%= @asset_type.historical_average_return %>
+</p>
+
+<%= link_to 'Edit', edit_asset_type_path(@asset_type) %> |
+<%= link_to 'Back', asset_types_path %>

@@ -1,0 +1,2 @@
+class PathAssetsController < ApplicationController
+end

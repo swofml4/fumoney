@@ -1,0 +1,2 @@
+class PathPortfoliosController < ApplicationController
+end

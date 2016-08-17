@@ -1,0 +1,31 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Correlations</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Correlation collection</th>
+      <th>Asset type1</th>
+      <th>Asset type2</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @correlations.each do |correlation| %>
+      <tr>
+        <td><%= correlation.correlation_collection %></td>
+        <td><%= correlation.asset_type1 %></td>
+        <td><%= correlation.asset_type2 %></td>
+        <td><%= link_to 'Show', correlation %></td>
+        <td><%= link_to 'Edit', edit_correlation_path(correlation) %></td>
+        <td><%= link_to 'Destroy', correlation, method: :delete , data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Correlation', new_correlation_path %>

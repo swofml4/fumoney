@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  correlation_collection_id: 
+  asset_type1_id: 
+  asset_type2_id: 
+
+two:
+  correlation_collection_id: 
+  asset_type1_id: 
+  asset_type2_id: 

@@ -1,0 +1,2 @@
+module PathAssetsHelper
+end

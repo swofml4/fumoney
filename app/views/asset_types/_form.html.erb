@@ -1,0 +1,29 @@
+<%= form_for(@asset_type) do |f| %>
+  <% if @asset_type.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@asset_type.errors.count, "error") %> prohibited this asset_type from being saved:</h2>
+
+      <ul>
+      <% @asset_type.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :name %><br>
+    <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :historical_std_deviation %><br>
+    <%= f.text_field :historical_std_deviation %>
+  </div>
+  <div class="field">
+    <%= f.label :historical_average_return %><br>
+    <%= f.text_field :historical_average_return %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

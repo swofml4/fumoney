@@ -1,0 +1,96 @@
+<h2>Matrix Test</h2>
+<p id="notice"><%= notice %></p>
+<h4>Correlation Matrix</h4>
+<table>
+<% for i in 0..(@correlation_matrix.row_count - 1) %>
+	<tr>
+	<% @correlation_matrix.row(i).each do |cell| %>
+		<td><%= cell.to_s %></td>
+	<% end %>
+	</tr>
+<% end %>
+</table>
+<hr>
+
+<h4>Derrived Correlation Matrix (Rounded to 5 digits)</h4>
+<table>
+<% for i in 0..(@derrived_correlation_matrix.row_count - 1) %>
+	<tr>
+	<% @derrived_correlation_matrix.row(i).each do |cell| %>
+		<td><%= cell.round(5).to_s %></td>
+	<% end %>
+	</tr>
+<% end %>
+</table>
+<hr>
+
+<h4>Calculated Correlation Matrix Derrived from Sample (Rounded to 5 digits)</h4>
+<table>
+<% for i in 0..(@calculated_correlation_matrix.row_count - 1) %>
+	<tr>
+	<% @calculated_correlation_matrix.row(i).each do |cell| %>
+		<td><%= cell.round(5).to_s %></td>
+	<% end %>
+	</tr>
+<% end %>
+</table>
+<hr>
+
+<h4>V</h4>
+<table>
+<% for i in 0..(@v.row_count - 1) %>
+	<tr>
+	<% @v.row(i).each do |cell| %>
+		<td><%= cell.to_s %></td>
+	<% end %>
+	</tr>
+<% end %>
+</table>
+<hr>
+
+<h4>D</h4>
+<table>
+<% for i in 0..(@d.row_count - 1) %>
+	<tr>
+	<% @d.row(i).each do |cell| %>
+		<td><%= cell.to_s %></td>
+	<% end %>
+	</tr>
+<% end %>
+</table>
+<hr>
+
+<h4>Sqrt D</h4>
+<table>
+<% for i in 0..(@sqrt_d.row_count - 1) %>
+	<tr>
+	<% @sqrt_d.row(i).each do |cell| %>
+		<td><%= cell.to_s %></td>
+	<% end %>
+	</tr>
+<% end %>
+</table>
+<hr>
+
+<h4>Random Numbers</h4>
+<table>
+<% for i in 0..(@normal_random.row_count - 1) %>
+	<tr>
+	<% @normal_random.row(i).each do |cell| %>
+		<td><%= cell.to_s %></td>
+	<% end %>
+	</tr>
+<% end %>
+</table>
+<hr>
+
+<h4>Correlated Random Numbers</h4>
+<table>
+<% for i in 0..(@correlated_random.row_count - 1) %>
+	<tr>
+	<% @correlated_random.row(i).each do |cell| %>
+		<td><%= cell.to_s %></td>
+	<% end %>
+	</tr>
+<% end %>
+</table>

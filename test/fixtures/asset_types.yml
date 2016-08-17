@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  historical_std_deviation: 9.99
+  historical_average_return: 9.99
+
+two:
+  name: MyString
+  historical_std_deviation: 9.99
+  historical_average_return: 9.99

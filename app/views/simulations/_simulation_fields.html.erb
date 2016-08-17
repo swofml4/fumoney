@@ -1,0 +1,54 @@
+<%= field_set_tag 'Key Ages and Simulation Configuration' do %>
+  <div class="field">
+    <%= f.label :title, "Simulation Title" %>
+    <%= f.text_field :title %>
+  </div>
+  <div class="field">
+    <%= f.label :starting_age %>
+    <%= f.text_field :starting_age %>
+  </div>
+  <div class="field">
+    <%= f.label :retirement_age %>
+    <%= f.text_field :retirement_age %>
+  </div>
+  <div class="field">
+    <%= f.label :last_simulation_age %>
+    <%= f.text_field :last_simulation_age %>
+  </div>
+  <div class="field">
+    <%= f.label :number_of_paths %>
+    <%= f.text_field :number_of_paths %>
+  </div>
+  <div class="field">
+    <%= options = options_from_collection_for_select(@correlation_collections, 'id', 'title') %>
+    <%= f.label :correlation_collection_id, "Type of Asset Correlations" %>
+    <%= f.select :correlation_collection_id,  options %>
+  </div>
+<% end %>
+<%= field_set_tag 'Contributions' do %>
+  <div class="field">
+    <%= f.label :annual_contribution, 'Initial Annual Contribution ($)' %>
+    <%= f.text_field :annual_contribution %>
+  </div>
+  <div class="field">
+    <%= f.label :contribution_growth, 'Annual Contribution Growth (%)' %>
+    <%= f.text_field :contribution_growth %>
+  </div>
+<% end %>
+<%= field_set_tag 'Draws at Retirement' do %>
+  <div class="field">
+    <%= f.label :retirement_draw, 'Initial Retirement Draw ($)' %>
+    <%= f.text_field :retirement_draw %>
+  </div>
+  <div class="field">
+    <%= f.label :retirement_draw_growth, 'Annual Retirement Draw Growth (%)' %>
+    <%= f.text_field :retirement_draw_growth %>
+  </div>
+<% end %>
+
+<%= field_set_tag 'Starting Assets' do %>
+	<%= f.fields_for :starting_assets do |builder| %>
+		<%= render 'starting_asset_fields', f: builder %>
+	<% end %>
+	<%= link_to_add_fields "Add Assets", f, :starting_assets %>
+<% end %>

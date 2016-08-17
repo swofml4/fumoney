@@ -1,0 +1,2 @@
+class StartingAssetsController < ApplicationController
+end

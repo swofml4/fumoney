@@ -1,0 +1,10 @@
+<fieldset class="fieldset-noborder">
+	<%= f.hidden_field :id %>
+	<%= f.label :correlation_amount, 'Correlation (%)' %>
+	<%= f.text_field :correlation_amount %>
+	<%= options = options_from_collection_for_select(@asset_types, 'id', 'name') %>
+	<%= f.select :asset_type1_id,  options %>
+	<%= f.select :asset_type2_id,  options %>
+	<%= f.hidden_field :_destroy %>
+	<%= link_to "Remove", '#', class: "remove_fields" %>
+</fieldset>
