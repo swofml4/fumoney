@@ -9,12 +9,14 @@
 //
 // Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
 // about supported directives.
-// I removed turbolinks because it was breaking some of my jquery calls
+// I removed turbolinks because it was breaking some of my jquery calls (I think)
 //
 //= require jquery
 //= require jquery_ujs
 //= require_tree .
+
 //= require highcharts/highcharts
+//= require highcharts/themes/grid
 //= require highcharts/highcharts-more
 
-//= require highcharts/themes/grid
+
