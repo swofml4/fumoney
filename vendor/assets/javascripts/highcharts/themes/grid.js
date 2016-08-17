@@ -78,6 +78,8 @@ Highcharts.theme = {
 		}
 	},
 	legend: {
+		verticalAlign: 'middle',
+		align: 'right',
 		itemStyle: {
 			font: '9pt Trebuchet MS, Verdana, sans-serif',
 			color: 'black'
