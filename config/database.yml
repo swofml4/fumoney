@@ -22,5 +22,8 @@ test:
   database: fumoney_test
 
 production:
-  <<: *default
+  adapter: mysql2
+  encoding: utf8
+  host: mysql.mikesmeandering.com
   database: fumoney_production
+  username: fumoney_db
