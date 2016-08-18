@@ -1,10 +1,14 @@
 
 
 class SimulationsController < ApplicationController
+  before_action :authenticate_user!, except: [:index]
   before_action :set_simulation, only: [:show, :edit, :update, :destroy]
   before_action :set_cache_headers
 
   def index
+  end
+
+  def build_simulation
   	@simulation = Simulation.new
     @asset_types = AssetType.all
     @correlation_collections = CorrelationCollection.all
@@ -45,34 +49,35 @@ class SimulationsController < ApplicationController
   def run_simulation
   	@simulation = Simulation.new(simulation_params)
   	@simulation.simulation_status = 'running'
-    @simulation.save
-    @simulation.starting_assets.each do |starting_asset|
-      if starting_asset.amount.nil?
-        starting_asset.destroy
-      elsif starting_asset.amount == 0
-        starting_asset.destroy
-      end
-    end
-    #TODO build an asset type map of ids to indexes, so I can ensure things map correctly
-    #I can't assume consistent asset_type_ids
-    asset_types = AssetType.all
-    asset_types_map = Hash.new
-    i = 0
-    asset_types.each do |asset_type|
-      asset_types_map[asset_type.id] = {:order => i, :mu => 1.00 + asset_type.historical_average_return / 100.00, 
-        :sigma => asset_type.historical_std_deviation / 100.00}
-      i += 1
-    end
-    correlation_matrix = build_correlation_matrix(@simulation,asset_types_map)
-  	@simulation.number_of_paths.times do |i|
-  		run_one_path(@simulation, i, asset_types_map, correlation_matrix)
-  	end
     respond_to do |format|
       if @simulation.save
-        format.html { redirect_to action: 'results', notice: 'Simulation was successfully created.' }
+        format.html { redirect_to simulations_manage_path, notice: 'Simulation is running, check back in a bit to see if it has completed' }
         format.json { render :results, status: :created, location: @simulation }
+
+        @simulation.starting_assets.each do |starting_asset|
+          if starting_asset.amount.nil?
+            starting_asset.destroy
+          elsif starting_asset.amount == 0
+            starting_asset.destroy
+          end
+        end
+
+        asset_types = AssetType.all
+        asset_types_map = Hash.new
+        i = 0
+        asset_types.each do |asset_type|
+          asset_types_map[asset_type.id] = {:order => i, :mu => 1.00 + asset_type.historical_average_return / 100.00, 
+            :sigma => asset_type.historical_std_deviation / 100.00}
+          i += 1
+        end
+        correlation_matrix = build_correlation_matrix(@simulation,asset_types_map)
+        @simulation.number_of_paths.times do |i|
+          run_one_path(@simulation, i, asset_types_map, correlation_matrix)
+        end
+        @simulation.simulation_status = 'completed'
+        @simulation.save
       else
-        format.html { redirect_to action: 'index', notice: 'Simulation save failed.'  }
+        format.html { redirect_to simulations_build_simulation_path, notice: 'Simulation not started due to invalid parameters.'  }
         format.json { render json: @simulation.errors, status: :unprocessable_entity }
       end
     end
@@ -173,7 +178,7 @@ def results
       end
       f.series(:type=> 'spline', :name=>'90th Percentile', :data=> percentile_up90,:showInLegend=>true, :enableMouseTracking=>true)
       f.series(:type=> 'spline', :name=>'75th Percentile', :data=> percentile_up50,:showInLegend=>true, :enableMouseTracking=>true)
-      f.series(:type=> 'spline', :name=>'Meadian Portfolio', :data=> median_money,:showInLegend=>true, :enableMouseTracking=>true)
+      f.series(:type=> 'spline', :name=>'Median Portfolio', :data=> median_money,:showInLegend=>true, :enableMouseTracking=>true)
       f.series(:type=> 'spline', :name=>'25th Percentile', :data=> percentile_down50,:showInLegend=>true, :enableMouseTracking=>true)
       f.series(:type=> 'spline', :name=>'10th Percentile', :data=> percentile_down90,:showInLegend=>true, :enableMouseTracking=>true)
     end

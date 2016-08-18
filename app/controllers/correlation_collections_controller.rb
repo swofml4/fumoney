@@ -1,4 +1,5 @@
 class CorrelationCollectionsController < ApplicationController
+  before_action :authenticate_user!
   before_action :set_correlation_collection, only: [:show, :edit, :update, :destroy]
 
   # GET /correlation_collections

@@ -1,4 +1,3 @@
-<p id="notice"><%= notice %></p>
 <%= form_for(@simulation, url: '/simulations/results') do |f| %>
   	<%= options = options_from_collection_for_select(@simulations, 'id', 'title') %>
 	<%= f.select :id,  options %>

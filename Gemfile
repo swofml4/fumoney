@@ -19,6 +19,8 @@ gem 'coffee-rails', '~> 4.1.0'
 # highcharts is used to build dynamic charts via javascript
 gem 'highcharts-rails'
 gem 'lazy_high_charts'
+#security gem
+gem 'devise'
 
 #a ruby version of PHPMath statistics library to do normal distributions
 gem 'rubystats'

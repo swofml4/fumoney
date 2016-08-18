@@ -20,7 +20,7 @@
     <%= f.text_field :number_of_paths %>
   </div>
   <div class="field">
-    <%= options = options_from_collection_for_select(@correlation_collections, 'id', 'title') %>
+    <% options = options_from_collection_for_select(@correlation_collections, 'id', 'title') %>
     <%= f.label :correlation_collection_id, "Type of Asset Correlations" %>
     <%= f.select :correlation_collection_id,  options %>
   </div>

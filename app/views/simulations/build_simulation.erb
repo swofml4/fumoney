@@ -1,0 +1,44 @@
+<blockquote>
+	<h2>Introduction</h2>
+    <p>This is a simple project to relearn RoR while building something useful. This should not be used for investment advice nor does it gurantee any sort of result. This simulator allows you to select a starting portfolio, consider annual contributions or draws, and see a probability distribution of results.</p>
+</blockquote>
+<hr>
+<h3>Assumptions</h3>
+<p align="justify">These assumptions were made to simplify the development.
+	<ol>
+		<li>All contributions or draws are made at the end of the year in a single chunk</li>
+		<li>Version 1 correlations between asset classes are fixed and reasonably conservative</li>
+		<li>Contributions and draws will prioritize out of allocation target assets first to minimize rebalancing events</li>
+		<li>Rebalancing events will happen on a per asset basis, returning them to exactly the target allocation and allocate to assets which are under allocated on a pro rata basis</li>
+	</ol>
+</p>
+<hr>
+		<%= form_for(@simulation, url: simulations_run_simulation_path) do |f| %>
+		  <% if @simulation.errors.any? %>
+		    <div id="error_explanation">
+		      <h2><%= pluralize(@simulation.errors.count, "error") %> prohibited this simulation from being saved:</h2>
+
+		      <ul>
+		      <% @simulation.errors.full_messages.each do |message| %>
+		        <li><%= message %></li>
+		      <% end %>
+		      </ul>
+		    </div>
+		  <% end %>
+		 	<div class="container-form">
+			  <%= render 'simulation_fields', f: f %>
+			  
+			  <div class="actions">
+			    <%= f.submit %>
+			  </div>
+			</div>
+		<% end %>
+        
+<h3>Run New Simulation</h3>
+<p align="justify">Fill in the details to the left and click run to kick off a new simulation. You will be taken to a status page showing the progress of this and any other running simulations. Once the simulation completes, you can view the results.</p>
+		
+<p align="justify">Where possible, defaults have been populated. These include things such as recommended retirement draw growth to ensure purchasing power is maintained</p>
+
+<p align="justify">Note: I am not currently sanitizing my inputs. Crap data will cause your simulation to crash (though you won't crash the overall program).</p>
+
+<div class="spacer" style="clear: both;"></div>

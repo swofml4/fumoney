@@ -1,4 +1,3 @@
-<p id="notice"><%= notice %></p>
 <blockquote>
 	<h2>Introduction</h2>
     <p>This is a simple project to relearn RoR while building something useful. This should not be used for investment advice nor does it gurantee any sort of result. This simulator allows you to select a starting portfolio, consider annual contributions or draws, and see a probability distribution of results.</p>
@@ -14,35 +13,5 @@
 	</ol>
 </p>
 <hr>
-
-
-
-		<%= form_for(@simulation, url: 'simulations/run_simulation') do |f| %>
-		  <% if @simulation.errors.any? %>
-		    <div id="error_explanation">
-		      <h2><%= pluralize(@simulation.errors.count, "error") %> prohibited this simulation from being saved:</h2>
-
-		      <ul>
-		      <% @simulation.errors.full_messages.each do |message| %>
-		        <li><%= message %></li>
-		      <% end %>
-		      </ul>
-		    </div>
-		  <% end %>
-		 	<div class="container-form">
-			  <%= render 'simulation_fields', f: f %>
-			  
-			  <div class="actions">
-			    <%= f.submit %>
-			  </div>
-			</div>
-		<% end %>
-        
-<h3>Run New Simulation</h3>
-<p align="justify">Fill in the details to the left and click run to kick off a new simulation. You will be taken to a status page showing the progress of this and any other running simulations. Once the simulation completes, you can view the results.</p>
-		
-<p align="justify">Where possible, defaults have been populated. These include things such as recommended retirement draw growth to ensure purchasing power is maintained</p>
-
-<p align="justify">Note: I am not currently sanitizing my inputs. Crap data will cause your simulation to crash (though you won't crash the overall program).</p>
-
-<div class="spacer" style="clear: both;"></div>
+<h2>Disclaimer!</h2>
+    <p>I built this project for fun. While I have attempted to build it in such a way to produce meaningful results, I highly recommend you do NOT make any investing decisions based on this tool. I have no liability concerning use of these results, past performance doesn't guarantee future results, all that crap.</p>

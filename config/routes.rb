@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
 
+  devise_for :users
   resources :correlations
   resources :correlation_collections
   resources :asset_types
@@ -15,6 +16,7 @@ Rails.application.routes.draw do
   patch 'simulations/results' => 'simulations#results'
   get 'simulations/matrix_test' => 'simulations#matrix_test'
   get 'simulations/sources' => 'simulations#sources'
+  get 'simulations/build_simulation' => 'simulations#build_simulation'
 
 
   root 'simulations#index'
