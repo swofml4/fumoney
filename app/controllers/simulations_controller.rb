@@ -301,18 +301,6 @@ private
     end
     asset_returns_sigma_shifted = (asset_returns_correlated * sigma_shift)
     asset_returns_shifted = asset_returns_sigma_shifted + mu_shift
-    #puts '~~~~~~~~~~~~~~~~~~~~~~~~~RAW RETURNS'
-    #puts asset_returns_raw.to_a.map(&:inspect)
-    #puts '~~~~~~~~~~~~~~~~~~~~~~~~~Corr RETURNS'
-    #puts asset_returns_correlated.to_a.map(&:inspect)
-    #puts '~~~~~~~~~~~~~~~~~~~~~~~~~Sigma Shift RETURNS'
-    #puts asset_returns_sigma_shifted.to_a.map(&:inspect)
-    #puts '~~~~~~~~~~~~~~~~~~~~~~~~~Shift RETURNS'
-    #puts asset_returns_shifted.to_a.map(&:inspect)
-    #puts '~~~~~~~~~~~~~~~~~~~~~~~~~MU'
-    #puts mu_shift.to_a.map(&:inspect)
-    #puts '~~~~~~~~~~~~~~~~~~~~~~~~~SigMA'
-    #puts sigma_shift.to_a.map(&:inspect)
     return asset_returns_shifted
   end
 
@@ -325,9 +313,8 @@ private
     
     
 		years_to_sim = current_simulation.last_simulation_age-current_simulation.starting_age
-		current_path = current_simulation.paths.create(:path_title => path_number.to_s, :path_type => 'mc sim')
-		last_portfolio = current_path.path_portfolios.create(:year => 0)
-
+		current_path = current_simulation.paths.new(:path_title => path_number.to_s, :path_type => 'mc sim')
+		last_portfolio = current_path.path_portfolios.new(:year => 0)
     #build the asset type map which will assign asset types to 0..N in a manner we can use consistently
     #get the correlation matrix <do these steps in the run and pass them as variables to path
 
@@ -338,51 +325,82 @@ private
     asset_returns_shifted = build_adjusted_from_correlation_matrix(asset_returns_raw,asset_types_map,correlation_matrix)
 
     current_simulation.starting_assets.each do |starting_asset|
-      last_portfolio.path_assets.create(:ending_amount => starting_asset.amount, 
+      last_portfolio.path_assets.new(:ending_amount => starting_asset.amount, 
         :asset_type_id => starting_asset.asset_type_id, :starting_amount => starting_asset.amount, :return_amount => 0, 
         :contributions_or_draw_amount => 0, :rebalance_amount => 0)
     end
 		for years_out in 1..(years_to_sim)
-			last_portfolio = run_one_year(current_simulation, current_path, last_portfolio, 
-        years_out, asset_returns_shifted.row(years_out-1), asset_types_map)
+      #refactor to run all years in fewer transactions
+			# last_portfolio = run_one_year(current_simulation, current_path, last_portfolio, 
+   #      years_out, asset_returns_shifted.row(years_out-1), asset_types_map)
+      asset_returns = asset_returns_shifted.row(years_out-1)
+      current_portfolio = current_path.path_portfolios.new(:year => years_out)
+      last_portfolio.path_assets.each do |asset|
+        current_asset = current_portfolio.path_assets.new(:starting_amount => asset.ending_amount, 
+          :asset_type_id => asset.asset_type_id)
+        current_asset.return_amount = current_asset.starting_amount * asset_returns[asset_types_map[asset.asset_type_id][:order]]
+        if current_asset.return_amount < 0 then
+          current_asset.return_amount = 0
+        end
+  #contributions and draws - gen 1 will do a pure pro rata, future will do these to align to target allocations
+        if current_simulation.starting_age + years_out < current_simulation.retirement_age
+          current_asset.contributions_or_draw_amount = current_asset.return_amount + 
+            current_simulation.annual_contribution * (1 + current_simulation.contribution_growth/100)**years_out / current_simulation.starting_assets.count
+        else
+          current_asset.contributions_or_draw_amount = current_asset.return_amount - 
+            current_simulation.retirement_draw * (1 + current_simulation.retirement_draw_growth/100)**(years_out - current_simulation.retirement_age + current_simulation.starting_age) /
+            current_simulation.starting_assets.count
+        end
+        if current_asset.contributions_or_draw_amount < 0 then
+          current_asset.contributions_or_draw_amount = 0
+        end
+  #rebalancing todo
+        current_asset.rebalance_amount = current_asset.contributions_or_draw_amount
+  #final ending balance for asset
+        current_asset.ending_amount = current_asset.rebalance_amount
+      end
+      last_portfolio = current_portfolio
 		end
+    ActiveRecord::Base.transaction do
+      current_path.save
+    end
   end
 
+# refactoring to reduce db transactions
 	#build the portfolio object and then the assets objects
 	#simulate the returns for each and update the post return results
 	#check if we should be doing adds or draws and do those based on target allocation
 	#if we still have need, rebalance
 	#save and return the current portfolio
 	def run_one_year(current_simulation, current_path, last_portfolio, years_out, asset_returns, asset_types_map)
-		current_portfolio = current_path.path_portfolios.create(:year => years_out)
-		last_portfolio.path_assets.each do |asset|
-			current_asset = current_portfolio.path_assets.create(:starting_amount => asset.ending_amount, :asset_type_id => asset.asset_type_id)
-#This is wrong, need to link into an asset type map
-      current_asset.return_amount = current_asset.starting_amount * asset_returns[asset_types_map[asset.asset_type_id][:order]]
-      if current_asset.return_amount < 0 then
-        current_asset.return_amount = 0
-      end
-#contributions and draws - gen 1 will do a pure pro rata, future will do these to align to target allocations
-      if current_simulation.starting_age + years_out < current_simulation.retirement_age
-        current_asset.contributions_or_draw_amount = current_asset.return_amount + 
-          current_simulation.annual_contribution * (1 + current_simulation.contribution_growth/100)**years_out / current_simulation.starting_assets.count
-      else
-        current_asset.contributions_or_draw_amount = current_asset.return_amount - 
-          current_simulation.retirement_draw * (1 + current_simulation.retirement_draw_growth/100)**(years_out - current_simulation.retirement_age + current_simulation.starting_age) /
-          current_simulation.starting_assets.count
-      end
-      if current_asset.contributions_or_draw_amount < 0 then
-        current_asset.contributions_or_draw_amount = 0
-      end
-#rebalancing todo
-      current_asset.rebalance_amount = current_asset.contributions_or_draw_amount
-#final ending balance for asset
-      current_asset.ending_amount = current_asset.rebalance_amount
-      current_asset.save
-      #need to add to a matrix the portfolio return profile
-			#later will need to simulate all the returns and then correlate them
-		end
-    return current_portfolio
+# 		current_portfolio = current_path.path_portfolios.create(:year => years_out)
+# 		last_portfolio.path_assets.each do |asset|
+# 			current_asset = current_portfolio.path_assets.create(:starting_amount => asset.ending_amount, :asset_type_id => asset.asset_type_id)
+# #This is wrong, need to link into an asset type map
+#       current_asset.return_amount = current_asset.starting_amount * asset_returns[asset_types_map[asset.asset_type_id][:order]]
+#       if current_asset.return_amount < 0 then
+#         current_asset.return_amount = 0
+#       end
+# #contributions and draws - gen 1 will do a pure pro rata, future will do these to align to target allocations
+#       if current_simulation.starting_age + years_out < current_simulation.retirement_age
+#         current_asset.contributions_or_draw_amount = current_asset.return_amount + 
+#           current_simulation.annual_contribution * (1 + current_simulation.contribution_growth/100)**years_out / current_simulation.starting_assets.count
+#       else
+#         current_asset.contributions_or_draw_amount = current_asset.return_amount - 
+#           current_simulation.retirement_draw * (1 + current_simulation.retirement_draw_growth/100)**(years_out - current_simulation.retirement_age + current_simulation.starting_age) /
+#           current_simulation.starting_assets.count
+#       end
+#       if current_asset.contributions_or_draw_amount < 0 then
+#         current_asset.contributions_or_draw_amount = 0
+#       end
+# #rebalancing todo
+#       current_asset.rebalance_amount = current_asset.contributions_or_draw_amount
+# #final ending balance for asset
+#       current_asset.ending_amount = current_asset.rebalance_amount
+#       current_asset.save
+
+# 		end
+#     return current_portfolio
 		#create another loop to go through the assets and calc their return amount and the % off from target
 	end
 
