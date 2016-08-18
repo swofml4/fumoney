@@ -129,7 +129,7 @@ def results
     @simulation = Simulation.new
   else
     @ruin_paths = 0.0
-    @simulation = Simulation.find(params[:simulation][:id])
+    @simulation = Simulation.includes(paths: {path_portfolios: :path_assets}).find(params[:simulation][:id])
     years_to_sim = @simulation.last_simulation_age-@simulation.starting_age
     money = Array.new(@simulation.number_of_paths){Array.new(years_to_sim+1)}
     median_money = Array.new(years_to_sim)
