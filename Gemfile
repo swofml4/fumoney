@@ -32,6 +32,7 @@ gem 'statsample'
 
 #resque and redis are used to process background jobs
 gem 'resque'
+gem 'resque-web', require: 'resque_web'
 
 #this gem should be able to build CRUD scaffolds from the schema
 gem 'schema_to_scaffold'

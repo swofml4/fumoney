@@ -1,6 +1,12 @@
+require "resque_web"
+
 Rails.application.routes.draw do
 
   devise_for :users
+  
+
+  mount ResqueWeb::Engine => "/resque_web"
+
   resources :correlations
   resources :correlation_collections
   resources :asset_types
