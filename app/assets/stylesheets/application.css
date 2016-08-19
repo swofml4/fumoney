@@ -112,6 +112,18 @@ Layout styles
 	box-shadow: 10px 10px 5px grey;
 }
 
+.container-form-small
+{
+	width: 20em;
+
+	float: left;
+	background-color: #F8F8F8;
+	border: 1px solid #eee;
+	border-radius: 25px;
+	padding: 10px;
+	box-shadow: 10px 10px 5px grey;
+}
+
 .fieldset-noborder
 {
    border:0 none;

@@ -11,8 +11,6 @@ module SimulationLib
       correlation_matrix.send(:[]=,asset_types_map[correlation.asset_type1_id][:order], 
         asset_types_map[correlation.asset_type2_id][:order], correlation.correlation_amount / 100.00)
     end
-    puts '~~~~~~~~~~~~~~~~CORRELATION MATRIX'
-    puts correlation_matrix
     return correlation_matrix
   end
 
@@ -84,8 +82,6 @@ module SimulationLib
       last_portfolio.path_assets.each do |asset|
         current_asset = current_portfolio.path_assets.new(:starting_amount => asset.ending_amount, 
           :asset_type_id => asset.asset_type_id)
-        puts "~~~~~~~~~~~~~~~~~~starting amount: " + asset.ending_amount.to_s
-        puts "~~~~~~~~~~~~~~~~~~year: " + years_out.to_s
         current_asset.return_amount = current_asset.starting_amount * asset_returns[asset_types_map[asset.asset_type_id][:order]] - current_asset.starting_amount
         
         portfolio_return_value += current_asset.return_amount + current_asset.starting_amount
@@ -98,7 +94,6 @@ module SimulationLib
           # tmp_asset = current_portfolio.path_assets.find_by(:asset_type_id => target_allocation.asset_type_id)
           tmp_asset = current_portfolio.path_assets.detect{|obj| obj.asset_type_id == target_allocation.asset_type_id}
           if tmp_asset.nil?          
-            puts '~~~~~~~~~~~~~~~~~~ This should never happen now that I fixed starting assets'
             tmp_asset = current_portfolio.path_assets.new(:starting_amount => 0.0, 
               :asset_type_id => target_allocation.asset_type_id, :return_amount => 0.0)
           end

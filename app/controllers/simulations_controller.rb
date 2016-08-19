@@ -4,7 +4,7 @@ class SimulationsController < ApplicationController
   include ApplicationHelper
   before_action :authenticate_user!, except: [:index]
   before_action :set_simulation, only: [:show, :edit, :update, :destroy]
-  before_action :set_cache_headers
+  before_action :set_cache_headers, only: [:results]
 
   def index
   end
