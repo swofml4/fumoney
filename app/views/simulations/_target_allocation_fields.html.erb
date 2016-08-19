@@ -1,8 +1,8 @@
 <fieldset class="fieldset-noborder">
 	<div class="field">
 		<%= f.hidden_field :id %>
-		<%= f.label :amount, 'Amount ($)' %>
-		<%= f.text_field :amount %>
+		<%= f.label :allocation, 'Allocation (%)' %>
+		<%= f.text_field :allocation %>
 		<%= options = options_from_collection_for_select(@asset_types, 'id', 'name') %>
 		<%= f.select :asset_type_id,  options %>
 		<%= f.hidden_field :_destroy %>

@@ -3,19 +3,20 @@
     <thead>
       <tr class = "table-header">
         <th>Title</th>
-        <th>number_of_paths</th>
-        <th>starting_age</th>
+        <th># Paths</th>
+        <th>Starting Age</th>
 
-        <th>retirement_age</th>
-        <th>last_simulation_age</th>
-        <th>annual_contribution</th>
+        <th>Retirement Age</th>
+        <th>Last Sim Age</th>
+        <th>Annual Contribution</th>
 
-        <th>contribution_growth</th>
-        <th>retirement_draw</th>
-        <th>retirement_draw_growth</th>
+        <th>Contribution Growth</th>
+        <th>Retirement Draw</th>
+        <th>Retirement Draw Growth</th>
+        <th>Rebalance Portfolio</th>
 
-        <th>risk_of_ruin</th>
-        <th>simulation_status</th>
+        <th>Risk of Ruin</th>
+        <th>Status</th>
 
         <th></th>
       </tr>
@@ -30,13 +31,14 @@
 
           <td><%= sim.retirement_age %></td>
           <td><%= sim.last_simulation_age %></td>
-          <td><%= sim.annual_contribution %></td>
+          <td><%= '$' + number_with_delimiter(sim.annual_contribution) %></td>
 
-          <td><%= sim.contribution_growth %></td>
-          <td><%= sim.retirement_draw %></td>
-          <td><%= sim.retirement_draw_growth %></td>
+          <td><%= sim.contribution_growth.to_s + '%' %></td>
+          <td><%= '$' + number_with_delimiter(sim.retirement_draw) %></td>
+          <td><%= sim.retirement_draw_growth.to_s + '%' %></td>
+          <td><%= sim.rebalance_flag %></td>
 
-          <td><%= sim.risk_of_ruin %></td>
+          <td><%= sim.risk_of_ruin.to_s + '%' %></td>
           <td><%= sim.simulation_status %></td>
 
           <td><%= link_to 'Destroy', sim, method: :delete, data: { confirm: 'Are you sure?' } %></td>

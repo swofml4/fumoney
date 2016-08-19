@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160818045939) do
+ActiveRecord::Schema.define(version: 20160818095227) do
 
   create_table "asset_types", force: :cascade do |t|
     t.string   "name",                      limit: 255
@@ -95,6 +95,7 @@ ActiveRecord::Schema.define(version: 20160818045939) do
     t.datetime "updated_at",                                            null: false
     t.integer  "correlation_collections_id", limit: 4
     t.integer  "correlation_collection_id",  limit: 4
+    t.boolean  "rebalance_flag"
   end
 
   add_index "simulations", ["correlation_collection_id"], name: "index_simulations_on_correlation_collection_id", using: :btree

@@ -85,7 +85,7 @@ a:focus { color: black; }
 a:hover 
 { 
 	color: green; 
-	background-color: white;
+	background-color: transparent;
 }
 a:active { color: red; }
 
@@ -105,11 +105,22 @@ Layout styles
 	width: 35em;
 	margin-right: 20px;
 	float: left;
+	background-color: #F8F8F8;
+	border: 1px solid #eee;
+	border-radius: 25px;
+	padding: 20px;
+	box-shadow: 10px 10px 5px grey;
 }
 
 .fieldset-noborder
 {
    border:0 none;
+}
+
+.field
+{
+	float: right;
+	margin-right: 5em;
 }
 
 .table-header

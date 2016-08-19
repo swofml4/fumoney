@@ -13,11 +13,11 @@
   </div>
   <div class="field">
     <%= f.label :last_simulation_age %>
-    <%= f.text_field :last_simulation_age %>
+    <%= f.text_field :last_simulation_age, placeholder: 'Must be greater than starting age' %>
   </div>
   <div class="field">
-    <%= f.label :number_of_paths %>
-    <%= f.text_field :number_of_paths %>
+    <%= f.label :number_of_paths, 'Number of Paths (Max 100)' %>
+    <%= f.text_field :number_of_paths, placeholder: 'Max 100 for performance' %>
   </div>
   <div class="field">
     <% options = options_from_collection_for_select(@correlation_collections, 'id', 'title') %>
@@ -47,8 +47,23 @@
 <% end %>
 
 <%= field_set_tag 'Starting Assets' do %>
+  <p>Note: current version requires some starting asset, even if it is just $1</p>
 	<%= f.fields_for :starting_assets do |builder| %>
 		<%= render 'starting_asset_fields', f: builder %>
 	<% end %>
 	<%= link_to_add_fields "Add Assets", f, :starting_assets %>
+<% end %>
+
+<%= field_set_tag 'Portfolio Rebalancing' do %>
+  <p>Do you want the porfolio to rebalance automatically every year? If so, you will need to define the target allocation below. This allocation should total up to 100%. If it doesn't, what you do enter will be proportionally scaled so it does. (e.g., if it totals up to 300%, each allocation will be scaled by 1/3)</p>
+  <p>If you do not flag the simulation to rebalance the portfolio, contributions and draws will be made proportionally to each asset, calculated annually. This is a simplifying assumption which means the law of probability will be working against you (i.e., you will double down on winners, which given the law of mean reversion, means your portfolio will further underperform). I though of a few creative other ways to do it, but this is simpler and more accurately reflects the characteristics of an emotional investor</p>
+  <div class="field">
+    <%= f.label :rebalance_flag %>
+    <%= f.check_box :rebalance_flag %>
+  </div>
+  <div class="spacer" style="clear: both;"></div>
+  <%= f.fields_for :target_allocations do |builder| %>
+    <%= render 'target_allocation_fields', f: builder %>
+  <% end %>
+  <%= link_to_add_fields "Add Assets Allocation", f, :target_allocations %>
 <% end %>

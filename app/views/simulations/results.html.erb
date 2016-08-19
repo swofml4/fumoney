@@ -22,11 +22,16 @@
 		<h4>Retirement</h4>
 			<%= 'Initial Annual Retirement Draw at Age ' + @simulation.retirement_age.to_s + ': $' +number_with_delimiter(@simulation.retirement_draw) %> &emsp;
 			<%= 'Retirement Draw Growth: ' + @simulation.retirement_draw_growth.to_s + '%' %> &emsp;
-			<%= 'Risk of Ruin (run out of money): ' + @ruin_chance.to_s + '%' %>
+			<%= 'Risk of Ruin (run out of money): ' + @simulation.risk_of_ruin.to_s + '%' %>
 		<h4>Other Settings</h4>
 			<%= 'Number of Trials: ' + @simulation.number_of_paths.to_s %> &emsp;
 	</blockquote>
 	<hr>
-	<%= high_chart("my_id6", @rngchart)  %>
+	<%= high_chart("rngchart", @rngchart)  %>
 	<p>The gray lines are individual trials. These do not have pop up values to prevent the graph from being unusably messy.</p>
+	<hr>
+	<%= high_chart("assetchart", @assetchart) %>
+	<hr>
+	<%= high_chart("assetreturnchart", @assetreturnchart) %>
+	
 <% end %>
