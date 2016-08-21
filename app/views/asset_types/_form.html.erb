@@ -10,20 +10,24 @@
       </ul>
     </div>
   <% end %>
-
-  <div class="field">
-    <%= f.label :name %><br>
-    <%= f.text_field :name %>
-  </div>
-  <div class="field">
-    <%= f.label :historical_std_deviation %><br>
-    <%= f.text_field :historical_std_deviation %>
-  </div>
-  <div class="field">
-    <%= f.label :historical_average_return %><br>
-    <%= f.text_field :historical_average_return %>
-  </div>
-  <div class="actions">
-    <%= f.submit %>
+  <div class="container-form-medium">
+    <div class="field">
+      <%= f.label :name %>
+      <%= f.text_field :name %>
+    </div>
+    <div class="field">
+      <%= f.label :historical_std_deviation %>
+      <%= f.text_field :historical_std_deviation %>
+    </div>
+    <div class="field">
+      <%= f.label :historical_average_return %>
+      <%= f.text_field :historical_average_return %>
+    </div>
+    <div class="spacer" style="clear: both;"></div>
+    <div class="actions">
+      <%= f.submit %>
+    </div>
   </div>
 <% end %>
+<div class="spacer" style="clear: both;"></div>
+<br>

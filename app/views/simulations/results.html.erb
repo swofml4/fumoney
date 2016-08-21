@@ -31,7 +31,9 @@
 	<p>The gray lines are individual trials. These do not have pop up values to prevent the graph from being unusably messy.</p>
 	<hr>
 	<%= high_chart("assetchart", @assetchart) %>
+
 	<hr>
-	<%= high_chart("assetreturnchart", @assetreturnchart) %>
+	<h4>Return Rate Frequency Hash</h4>
+	<%= @return_rate_frequency.to_s %>
 	
 <% end %>

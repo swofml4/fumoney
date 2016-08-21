@@ -10,11 +10,12 @@
       </ul>
     </div>
   <% end %>
-  <div class="container-form">
+  <div class="container-form-large">
     <div class="field">
-      <%= f.label :title %><br>
+      <%= f.label :title %>
       <%= f.text_field :title %>
     </div>
+    <div class="spacer" style="clear: both;"></div>
     <%= field_set_tag 'Correlations' do %>
     <%= f.fields_for :correlations do |builder| %>
       <%= render 'correlation_fields', f: builder %>
@@ -27,3 +28,4 @@
   </div>
 <% end %>
 <div class="spacer" style="clear: both;"></div>
+<br>

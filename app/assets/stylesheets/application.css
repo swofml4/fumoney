@@ -124,6 +124,30 @@ Layout styles
 	box-shadow: 10px 10px 5px grey;
 }
 
+.container-form-large
+{
+	width: 60em;
+
+	float: left;
+	background-color: #F8F8F8;
+	border: 1px solid #eee;
+	border-radius: 25px;
+	padding: 10px;
+	box-shadow: 10px 10px 5px grey;
+}
+
+.container-form-medium
+{
+	width: 30em;
+
+	float: left;
+	background-color: #F8F8F8;
+	border: 1px solid #eee;
+	border-radius: 25px;
+	padding: 10px;
+	box-shadow: 10px 10px 5px grey;
+}
+
 .fieldset-noborder
 {
    border:0 none;
@@ -132,7 +156,7 @@ Layout styles
 .field
 {
 	float: right;
-	margin-right: 5em;
+	margin-right: 2em;
 }
 
 .table-header
@@ -143,17 +167,28 @@ Layout styles
 .header
 {
 	color: #fff;
-	background: #555;
+	background: #333; /* For browsers that do not support gradients */
+	background: -webkit-linear-gradient(left, #333 , #ddd); /* For Safari 5.1 to 6.0 */
+	background: -o-linear-gradient(right, #333 , #ddd); /* For Opera 11.1 to 12.0 */
+	background: -moz-linear-gradient(right, #333 , #ddd); /* For Firefox 3.6 to 15 */
+	background: linear-gradient(to right, #333 , #ddd); /* Standard syntax */
 	padding: 1em 1.25em;
 }
 
-.header-heading { margin: 0; }
+.header-heading { 
+	margin: 0; 
+	text-shadow: 3px 3px 8px #111;
+}
 
 .header-img { float: right; }
 
 .nav-bar
 {
 	background: #000;
+	background: -webkit-linear-gradient(left, #333 , #000); /* For Safari 5.1 to 6.0 */
+	background: -o-linear-gradient(right, #333 , #000); /* For Opera 11.1 to 12.0 */
+	background: -moz-linear-gradient(right, #333 , #000); /* For Firefox 3.6 to 15 */
+	background: linear-gradient(to right, #333 , #000); /* Standard syntax */
 	padding: 0;
 }
 
@@ -166,7 +201,11 @@ Layout styles
 .footer
 {
 	color: #fff;
-	background: #000;
+	background: #333; /* For browsers that do not support gradients */
+	background: -webkit-linear-gradient(left, #333 , #ddd); /* For Safari 5.1 to 6.0 */
+	background: -o-linear-gradient(right, #333 , #ddd); /* For Opera 11.1 to 12.0 */
+	background: -moz-linear-gradient(right, #333 , #ddd); /* For Firefox 3.6 to 15 */
+	background: linear-gradient(to right, #333 , #ddd); /* Standard syntax */
 	padding: 0.5em 0.5em;
 }
 

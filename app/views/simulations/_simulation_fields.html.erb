@@ -16,8 +16,8 @@
     <%= f.text_field :last_simulation_age, placeholder: 'Must be greater than starting age' %>
   </div>
   <div class="field">
-    <%= f.label :number_of_paths, 'Number of Paths (Max 100)' %>
-    <%= f.text_field :number_of_paths, placeholder: 'Max 100 for performance' %>
+    <%= f.label :number_of_paths, 'Number of Paths (Max 1000)' %>
+    <%= f.text_field :number_of_paths, placeholder: 'Max 1000 for performance' %>
   </div>
   <div class="field">
     <% options = options_from_collection_for_select(@correlation_collections, 'id', 'title') %>

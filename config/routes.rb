@@ -2,6 +2,12 @@ require "resque_web"
 
 Rails.application.routes.draw do
 
+  get 'admin_sections/index'
+
+  get 'admin_sections/list_users'
+
+  get 'admin_sections/edit_user'
+
   devise_for :users
   
 

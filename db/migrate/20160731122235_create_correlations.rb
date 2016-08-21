@@ -1,7 +1,7 @@
 class CreateCorrelations < ActiveRecord::Migration
   def change
     create_table :correlations do |t|
-      t.decimal :corr, :precision => 15, :scale => 10
+      t.decimal :correlation_amount, :precision => 6, :scale => 2
       t.timestamps null: false
     end
     

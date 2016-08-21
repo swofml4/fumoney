@@ -80,14 +80,16 @@ class SimulationsController < ApplicationController
       
       starting_assets = @simulation.starting_assets.all
       asset_types_map = Hash.new
+
       i = 0
       @simulation.starting_assets.each do |starting_asset|
         asset_types_map[starting_asset.asset_type_id] = {:order => i, :name => starting_asset.asset_type.name}
         i += 1
       end
       mean_asset_money = Array.new(asset_types_map.keys.count){Array.new(years_to_sim+1,0.0)}
-      mean_asset_returns = Array.new(asset_types_map.keys.count){Array.new(years_to_sim+1,0.0)}
-
+      asset_return_rates = Array.new(asset_types_map.keys.count){Array.new(years_to_sim * @simulation.paths.count,0.0)}
+      asset_return_rates_rounded = Array.new(asset_types_map.keys.count){Array.new(years_to_sim * @simulation.paths.count,0.0)}
+      @return_rate_frequency = Hash.new 0
       median_money = Array.new(years_to_sim)
       mean_money = Array.new(years_to_sim)
       percentile_up50 = Array.new(years_to_sim)
@@ -99,18 +101,16 @@ class SimulationsController < ApplicationController
         path.path_portfolios.each do |portfolio|
           portfolio.path_assets.each do |asset|
             temp_money = temp_money + asset.ending_amount
-            mean_asset_money[asset_types_map[asset.asset_type_id][:order]][portfolio.year] += asset.ending_amount / @simulation.number_of_paths
-            if asset.starting_amount == 0
-              mean_asset_returns[asset_types_map[asset.asset_type_id][:order]][portfolio.year] += 0.0
-            else
-              mean_asset_returns[asset_types_map[asset.asset_type_id][:order]][portfolio.year] += 
-                1.0 * asset.return_amount / asset.starting_amount / @simulation.number_of_paths
+            mean_asset_money[asset_types_map[asset.asset_type_id][:order]][portfolio.year] += (asset.ending_amount / @simulation.number_of_paths).round()
+            if portfolio.year != 0 #no return in year zero as no time has passed
+              asset_return_rates_rounded[asset_types_map[asset.asset_type_id][:order]][portfolio.year-1 + ((path.path_title.to_i-1) * years_to_sim)] = asset.return_rate
+              #asset_return_rates[asset_types_map[asset.asset_type_id][:order]][portfolio.year-1 + ((path.path_title.to_i-1) * years_to_sim)] = asset.return_rate
             end
           end
           if temp_money == 0 and graph_log
             temp_money = 0.001
           end
-          money[path.path_title.to_i-1][portfolio.year] = temp_money
+          money[path.path_title.to_i-1][portfolio.year] = temp_money.round
           temp_money = 0.0
         end
       end
@@ -126,6 +126,17 @@ class SimulationsController < ApplicationController
         percentile_down90[k] = stats.value_from_percentile(5)
       end
 
+      @simulation.starting_assets.each do |starting_asset|
+        @return_rate_frequency[asset_types_map[starting_asset.asset_type_id][:order]] = {:name => asset_types_map[starting_asset.asset_type_id][:name]}
+        for i in 0..(years_to_sim * @simulation.paths.count - 1) 
+          if @return_rate_frequency[asset_types_map[starting_asset.asset_type_id][:order]][(asset_return_rates_rounded[asset_types_map[starting_asset.asset_type_id][:order]][i]-1).to_s + '%'].nil?
+            @return_rate_frequency[asset_types_map[starting_asset.asset_type_id][:order]][(asset_return_rates_rounded[asset_types_map[starting_asset.asset_type_id][:order]][i]-1).to_s + '%'] = 1
+          else
+            @return_rate_frequency[asset_types_map[starting_asset.asset_type_id][:order]][(asset_return_rates_rounded[asset_types_map[starting_asset.asset_type_id][:order]][i]-1).to_s + '%'] += 1
+          end
+        end
+      end
+
       @rngchart = LazyHighCharts::HighChart.new('graph') do |f|
         f.title({ :text=>@simulation.id.to_s + ': ' + @simulation.title})
         f.yAxis({title: {text: "Portfolio Value", margin: 10}})
@@ -137,6 +148,8 @@ class SimulationsController < ApplicationController
         end
         f.options[:xAxis][:categories] = (@simulation.starting_age..@simulation.last_simulation_age).to_a
         for i in 0..(@simulation.paths.count-1)
+          puts "path #{i} ~~~~~~~~~~~~~~~~~~~~~~"
+          puts money[i]
           f.series(:type=> 'spline', :name=>"path #{i}", :data=> money[i],:showInLegend=>false, :enableMouseTracking=>false, :color=>'#CCCCCC')
         end
         f.series(:type=> 'spline', :name=>'90th Percentile', :data=> percentile_up90,:showInLegend=>true, :enableMouseTracking=>true)
@@ -160,18 +173,21 @@ class SimulationsController < ApplicationController
         }
       end
 
-      @assetreturnchart = LazyHighCharts::HighChart.new('graph') do |f|
-        f.title({ :text=>'Mean Asset Returns'})
-        f.yAxis({title: {text: "Return Rate", margin: 10}})
-        f.xAxis({title: {text: "Age", margin: 10}})
-        if graph_log
-          f.options[:yAxis][:type]='logarithmic'
-        end
-        f.options[:xAxis][:categories] = (@simulation.starting_age..@simulation.last_simulation_age).to_a
-        asset_types_map.each { |key,value|
-          f.series(:type=> 'spline', :name=>value[:name], :data=> mean_asset_returns[value[:order]],:showInLegend=>true, :enableMouseTracking=>true)
-        }
-      end
+  #     @assetreturnchart = LazyHighCharts::HighChart.new('column') do |f|
+  #       f.title({ :text=>'Asset Return Histogram'})
+  #       f.options[:chart][:defaultSeriesType] = "column"
+  #       f.yAxis({title: {text: "Frequency", margin: 10}})
+  #       f.xAxis({title: {text: "Return Rate", margin: 10}})
+
+  #       f.options[:xAxis][:categories] = (@simulation.starting_age..@simulation.last_simulation_age).to_a
+  #       asset_types_map.each { |key,value|
+  #         f.series(:type=> 'spline', :name=>value[:name], :data=> mean_asset_returns[value[:order]],:showInLegend=>true, :enableMouseTracking=>true)
+  #       }
+  #     end
+
+  #     f.series(:name=>'Incorrect',:data=> [10, 2, 3, 1, 4]) 
+  # f.options[:xAxis] = {:plot_bands => "none", :categories => ["1.1.2011", "2.1.2011"]}
+
     end
   end
 
@@ -214,37 +230,7 @@ private
 	#check if we should be doing adds or draws and do those based on target allocation
 	#if we still have need, rebalance
 	#save and return the current portfolio
-	def run_one_year(current_simulation, current_path, last_portfolio, years_out, asset_returns, asset_types_map)
-# 		current_portfolio = current_path.path_portfolios.create(:year => years_out)
-# 		last_portfolio.path_assets.each do |asset|
-# 			current_asset = current_portfolio.path_assets.create(:starting_amount => asset.ending_amount, :asset_type_id => asset.asset_type_id)
-# #This is wrong, need to link into an asset type map
-#       current_asset.return_amount = current_asset.starting_amount * asset_returns[asset_types_map[asset.asset_type_id][:order]]
-#       if current_asset.return_amount < 0 then
-#         current_asset.return_amount = 0
-#       end
-# #contributions and draws - gen 1 will do a pure pro rata, future will do these to align to target allocations
-#       if current_simulation.starting_age + years_out < current_simulation.retirement_age
-#         current_asset.contributions_or_draw_amount = current_asset.return_amount + 
-#           current_simulation.annual_contribution * (1 + current_simulation.contribution_growth/100)**years_out / current_simulation.starting_assets.count
-#       else
-#         current_asset.contributions_or_draw_amount = current_asset.return_amount - 
-#           current_simulation.retirement_draw * (1 + current_simulation.retirement_draw_growth/100)**(years_out - current_simulation.retirement_age + current_simulation.starting_age) /
-#           current_simulation.starting_assets.count
-#       end
-#       if current_asset.contributions_or_draw_amount < 0 then
-#         current_asset.contributions_or_draw_amount = 0
-#       end
-# #rebalancing todo
-#       current_asset.rebalance_amount = current_asset.contributions_or_draw_amount
-# #final ending balance for asset
-#       current_asset.ending_amount = current_asset.rebalance_amount
-#       current_asset.save
 
-# 		end
-#     return current_portfolio
-		#create another loop to go through the assets and calc their return amount and the % off from target
-	end
 
 
   

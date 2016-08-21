@@ -38,18 +38,33 @@ class SimulationRunner
           end
         end
 
-        asset_types = AssetType.all
+        starting_assets = sim.starting_assets.all
         asset_types_map = Hash.new
         i = 0
-        asset_types.each do |asset_type|
+        starting_assets.each do |starting_asset|
+          asset_type = AssetType.find(starting_asset.asset_type_id)
           asset_types_map[asset_type.id] = {:order => i, :mu => 1.00 + asset_type.historical_average_return / 100.00, 
             :sigma => asset_type.historical_std_deviation / 100.00}
           i += 1
         end
-        #space test
+        puts '~1'
         correlation_matrix = build_correlation_matrix(sim,asset_types_map)
+        #assume a cholesky decomp isnt possible, so we will do an eigensystem decomp
+        v, d, v_inv = correlation_matrix.eigensystem
+        puts '~2'
+        #so, this is stupid, but something from sciruby broke fractional exponents
+        #fortunately, on a diagonal matrix, this is trivial to do in a loop manually, which is what I am doing
+        #@d will always be diagnoal from an eigensystem
+        sqrt_d = Matrix.build(correlation_matrix.row_count,correlation_matrix.row_count) {0.00}
+        puts '~3'
+        for i in 0..(d.row_count-1)
+          sqrt_d.send(:[]=,i, i,d[i,i].round(18) ** 0.5)
+        end
+        puts '~4'
+        v_sqrt_d_eigens = (v * sqrt_d).round(18)
+        puts '~5'
         sim.number_of_paths.times do |i|
-          ruin_path_count += run_one_path(sim, i, asset_types_map, correlation_matrix)
+          ruin_path_count += run_one_path(sim, i, asset_types_map, correlation_matrix, v_sqrt_d_eigens)
           sim.simulation_status = (100.0 * i / sim.number_of_paths).round.to_s + '%'
           sim.save
         end

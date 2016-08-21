@@ -23,26 +23,28 @@
     </thead>
 
     <tbody>
-      <% @simulations.each do |sim| %>
-        <tr>
-          <td><%= sim.title %></td>
-          <td><%= sim.number_of_paths %></td>
-          <td><%= sim.starting_age %></td>
+      <div id="manage_sims">
+        <% @simulations.each do |sim| %>
+          <tr>
+            <td><%= sim.title %></td>
+            <td><%= sim.number_of_paths %></td>
+            <td><%= sim.starting_age %></td>
 
-          <td><%= sim.retirement_age %></td>
-          <td><%= sim.last_simulation_age %></td>
-          <td><%= '$' + number_with_delimiter(sim.annual_contribution) %></td>
+            <td><%= sim.retirement_age %></td>
+            <td><%= sim.last_simulation_age %></td>
+            <td><%= '$' + number_with_delimiter(sim.annual_contribution) %></td>
 
-          <td><%= sim.contribution_growth.to_s + '%' %></td>
-          <td><%= '$' + number_with_delimiter(sim.retirement_draw) %></td>
-          <td><%= sim.retirement_draw_growth.to_s + '%' %></td>
-          <td><%= sim.rebalance_flag %></td>
+            <td><%= sim.contribution_growth.to_s + '%' %></td>
+            <td><%= '$' + number_with_delimiter(sim.retirement_draw) %></td>
+            <td><%= sim.retirement_draw_growth.to_s + '%' %></td>
+            <td><%= sim.rebalance_flag %></td>
 
-          <td><%= sim.risk_of_ruin.to_s + '%' %></td>
-          <td><%= sim.simulation_status %></td>
+            <td><%= sim.risk_of_ruin.to_s + '%' %></td>
+            <td><%= sim.simulation_status %></td>
 
-          <td><%= link_to 'Destroy', sim, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-        </tr>
-      <% end %>
+            <td><%= link_to 'Destroy', sim, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+          </tr>
+        <% end %>
+      </div>
     </tbody>
   </table>

@@ -25,8 +25,12 @@
 				<li><%= link_to 'New Sim', simulations_build_simulation_path %></li>
                 <li><%= link_to 'View Results', simulations_results_path %></li>
                 <li><%= link_to 'Manage Sims', simulations_manage_path %></li>
-                <li><%= link_to 'Asset Types', asset_types_path %></li>
-                <li><%= link_to 'Corr Collection', correlation_collections_path %></li>
+	            <% if user_signed_in? %>
+	                <% if current_user.admin_flag %>
+		                <li><%= link_to 'Asset Types', asset_types_path %></li>
+		                <li><%= link_to 'Corr Collection', correlation_collections_path %></li>
+	                <% end %>
+	               <% end %>
                 <li><%= link_to 'External Sources', simulations_sources_path %></li>
                 <li><%= link_to 'Matrix Test', simulations_matrix_test_path %></li>
                 <% if user_signed_in? %>

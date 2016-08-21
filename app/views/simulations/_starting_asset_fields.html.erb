@@ -3,7 +3,7 @@
 		<%= f.hidden_field :id %>
 		<%= f.label :amount, 'Amount ($)' %>
 		<%= f.text_field :amount %>
-		<%= options = options_from_collection_for_select(@asset_types, 'id', 'name') %>
+		<% options = options_from_collection_for_select(@asset_types, 'id', 'name') %>
 		<%= f.select :asset_type_id,  options %>
 		<%= f.hidden_field :_destroy %>
 		<%= link_to "Remove", '#', class: "remove_fields" %>

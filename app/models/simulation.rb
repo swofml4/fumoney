@@ -9,5 +9,5 @@ class Simulation < ActiveRecord::Base
 		:reject_if => proc { |attributes| attributes['_destroy'] == '1' }
 		
 	validates :title, presence: true
-	validates :number_of_paths, inclusion: 1..100
+	validates :number_of_paths, inclusion: 1..1000
 end

@@ -1,5 +1,5 @@
 class CorrelationCollectionsController < ApplicationController
-  before_action :authenticate_user!
+  before_action :check_admin_access
   before_action :set_correlation_collection, only: [:show, :edit, :update, :destroy]
 
   # GET /correlation_collections
@@ -67,7 +67,7 @@ class CorrelationCollectionsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_correlation_collection
-      @correlation_collection = CorrelationCollection.find(params[:id])
+      @correlation_collection = CorrelationCollection.includes(:correlations).find(params[:id])
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
