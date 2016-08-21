@@ -17,9 +17,9 @@ module SimulationLib
           asset_types_map[correlation.asset_type1_id][:order], (correlation.correlation_amount / 100.00).round(2))
       end
     end
-    puts 'correlation built~~~~~~~~~~~~'
-    puts correlation_matrix.inspect
-    puts 'end correlation matrix ~~~~~~'
+    #puts 'correlation built~~~~~~~~~~~~'
+    #puts correlation_matrix.inspect
+    #puts 'end correlation matrix ~~~~~~'
     return correlation_matrix
   end
 
@@ -27,13 +27,13 @@ module SimulationLib
 
     #correlate the random results
     arr_transposed = asset_returns_raw.transpose
-    puts 'can transpose'
+    #puts 'can transpose'
     arc = (v_sqrt_d_eigens * arr_transposed).round(18)
-    puts 'can mult'
+    #puts 'can mult'
     asset_returns_correlated = arc.transpose
-    puts 'can transpose again'
+    #puts 'can transpose again'
     #asset_returns_correlated = (v_sqrt_d_eigens * asset_returns_raw.transpose).transpose
-    puts 'transposed'
+    #puts 'transposed'
     #sigma mu shift results
     sigma_shift = Matrix.build(correlation_matrix.row_count,correlation_matrix.row_count) {0.00}
     for i in 0..(v_sqrt_d_eigens.row_count-1)
@@ -47,7 +47,7 @@ module SimulationLib
     end
     asset_returns_sigma_shifted = (asset_returns_correlated * sigma_shift)
     asset_returns_shifted = asset_returns_sigma_shifted + mu_shift
-    puts 'correlation assets FINISHED~~~~~~~~~~~~~'
+    #puts 'correlation assets FINISHED~~~~~~~~~~~~~'
     return asset_returns_shifted
   end
 
@@ -55,7 +55,7 @@ module SimulationLib
     #start with a collection of standard normal numbers with mu of 0 and sigma of 1
     #this allows shaping of the results by asset correlations
     #after adjusted for correlations, we will adjust the sigma and mu
-    puts '~~~~~~start path'
+    #puts '~~~~~~start path'
     gen = Rubystats::NormalDistribution.new(0,1)
     asset_types = AssetType.all
     
@@ -72,8 +72,8 @@ module SimulationLib
     #multistep process to build asset returns. we create every year for every asset, which will be passed
     #year by year to the one year process. That process will pull asset returns as needed
     asset_returns_raw = Matrix.build(years_to_sim,current_simulation.starting_assets.count) { gen.rng }
-    puts 'asset returns raw ~~~~~~~~~~~~~~~~~~~~~'
-    puts asset_returns_raw.inspect
+    #puts 'asset returns raw ~~~~~~~~~~~~~~~~~~~~~'
+    #puts asset_returns_raw.inspect
     asset_returns_shifted = build_adjusted_from_correlation_matrix(asset_returns_raw,asset_types_map,correlation_matrix, v_sqrt_d_eigens)
 
     current_simulation.starting_assets.each do |starting_asset|
