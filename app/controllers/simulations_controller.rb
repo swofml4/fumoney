@@ -31,19 +31,20 @@ class SimulationsController < ApplicationController
   end
 
   def matrix_test
-    @correlation_matrix = Matrix[[1.0,0.8,0.2],[0.8,1.0,0.4],[0.2,0.4,1.0]]
+    @correlation_matrix = (Matrix[[1.0,0.2,0.4,0.1],[0.2,1.0,0.5,0.6],[0.4,0.5,1.0,0.9],[0.1,0.6,0.9,1.0]]).round(2)
     #@correlation_matrix = Matrix[[1,1,1],[1,1,1],[1,1,1]]
+    Rails.logger.debug @correlation_matrix.inspect
     @v, @d, @v_inv = @correlation_matrix.eigensystem
-    @sqrt_d = Matrix.build(3,3) {0}
+    @sqrt_d = Matrix.build(4,4) {0}
     for i in 0..(@d.column_count-1)
       @sqrt_d.send(:[]=,i, i,@d[i,i] ** 0.5)
     end
     @derrived_correlation_matrix = @v * @d * @v_inv
     gen = Rubystats::NormalDistribution.new(0.0,1.0)
-    @normal_random = Matrix.build(100000,3) { gen.rng }
+    @normal_random = Matrix.build(100000,4) { gen.rng }
     @correlated_random = (@v * @sqrt_d * @normal_random.transpose).transpose
     ds = {'a'=>@correlated_random.column(0), 'b'=>@correlated_random.column(1),
-      'c'=>@correlated_random.column(2)}.to_dataset
+      'c'=>@correlated_random.column(2),'d'=>@correlated_random.column(3)}.to_dataset
     @calculated_correlation_matrix = Statsample::Bivariate.correlation_matrix(ds)
   end
 
@@ -94,16 +95,20 @@ class SimulationsController < ApplicationController
       mean_money = Array.new(years_to_sim)
       percentile_up50 = Array.new(years_to_sim)
       percentile_up90 = Array.new(years_to_sim)
+      percentile_up95 = Array.new(years_to_sim)
       percentile_down50 = Array.new(years_to_sim)
       percentile_down90 = Array.new(years_to_sim)
+      percentile_down95 = Array.new(years_to_sim)
       temp_money = 0.0
+      lowest_return = -20
+      highest_return = 50
       @simulation.paths.each do |path|
         path.path_portfolios.each do |portfolio|
           portfolio.path_assets.each do |asset|
             temp_money = temp_money + asset.ending_amount
             mean_asset_money[asset_types_map[asset.asset_type_id][:order]][portfolio.year] += (asset.ending_amount / @simulation.number_of_paths).round()
             if portfolio.year != 0 #no return in year zero as no time has passed
-              asset_return_rates_rounded[asset_types_map[asset.asset_type_id][:order]][portfolio.year-1 + ((path.path_title.to_i-1) * years_to_sim)] = asset.return_rate
+              asset_return_rates_rounded[asset_types_map[asset.asset_type_id][:order]][portfolio.year-1 + ((path.path_title.to_i-1) * years_to_sim)] = asset.return_rate * 100
               #asset_return_rates[asset_types_map[asset.asset_type_id][:order]][portfolio.year-1 + ((path.path_title.to_i-1) * years_to_sim)] = asset.return_rate
             end
           end
@@ -120,22 +125,46 @@ class SimulationsController < ApplicationController
         stats = DescriptiveStatistics::Stats.new(money_transpose[k])
         percentile_up50[k] = stats.value_from_percentile(75)
         percentile_up90[k] = stats.value_from_percentile(95)
+        percentile_up95[k] = stats.value_from_percentile(98)
         median_money[k] = stats.median
         mean_money[k] = stats.mean
         percentile_down50[k] = stats.value_from_percentile(25)
         percentile_down90[k] = stats.value_from_percentile(5)
+        percentile_down95[k] = stats.value_from_percentile(2)
       end
 
       @simulation.starting_assets.each do |starting_asset|
         @return_rate_frequency[asset_types_map[starting_asset.asset_type_id][:order]] = {:name => asset_types_map[starting_asset.asset_type_id][:name]}
         for i in 0..(years_to_sim * @simulation.paths.count - 1) 
-          if @return_rate_frequency[asset_types_map[starting_asset.asset_type_id][:order]][(asset_return_rates_rounded[asset_types_map[starting_asset.asset_type_id][:order]][i]-1).to_s + '%'].nil?
-            @return_rate_frequency[asset_types_map[starting_asset.asset_type_id][:order]][(asset_return_rates_rounded[asset_types_map[starting_asset.asset_type_id][:order]][i]-1).to_s + '%'] = 1
+          if @return_rate_frequency[asset_types_map[starting_asset.asset_type_id][:order]][(asset_return_rates_rounded[asset_types_map[starting_asset.asset_type_id][:order]][i]-1).round.to_s].nil?
+            @return_rate_frequency[asset_types_map[starting_asset.asset_type_id][:order]][(asset_return_rates_rounded[asset_types_map[starting_asset.asset_type_id][:order]][i]-1).round.to_s] = 1
           else
-            @return_rate_frequency[asset_types_map[starting_asset.asset_type_id][:order]][(asset_return_rates_rounded[asset_types_map[starting_asset.asset_type_id][:order]][i]-1).to_s + '%'] += 1
+            @return_rate_frequency[asset_types_map[starting_asset.asset_type_id][:order]][(asset_return_rates_rounded[asset_types_map[starting_asset.asset_type_id][:order]][i]-1).round.to_s] += 1
+          end
+          if asset_return_rates_rounded[asset_types_map[starting_asset.asset_type_id][:order]][i] < lowest_return
+            #lowest_return = asset_return_rates_rounded[asset_types_map[starting_asset.asset_type_id][:order]][i]
+          end
+          if asset_return_rates_rounded[asset_types_map[starting_asset.asset_type_id][:order]][i] > highest_return
+            #highest_return = asset_return_rates_rounded[asset_types_map[starting_asset.asset_type_id][:order]][i]
           end
         end
       end
+      Rails.logger.debug "highest: #{highest_return} lowest: #{lowest_return}"
+      asset_return_histogram = Array.new(asset_types_map.keys.count) { Array.new((highest_return - lowest_return) + 1,0) }
+      asset_return_axis = Array.new((highest_return - lowest_return)+ 1)
+      for i in 0..(asset_types_map.keys.count-1)
+        for j in 0..((highest_return - lowest_return))
+          Rails.logger.debug "#{i},#{j} "
+          asset_return_axis[j] = (lowest_return + j).round.to_s + '%'
+          if @return_rate_frequency[i][(lowest_return + j).to_s].nil?
+
+          else
+            Rails.logger.debug asset_return_axis[j] + " #{i},#{j}: " + @return_rate_frequency[i][(lowest_return + j).to_s].to_s
+            asset_return_histogram[i][j] = @return_rate_frequency[i][(lowest_return + j).to_s]
+          end
+        end
+      end
+
 
       @rngchart = LazyHighCharts::HighChart.new('graph') do |f|
         f.title({ :text=>@simulation.id.to_s + ': ' + @simulation.title})
@@ -147,11 +176,12 @@ class SimulationsController < ApplicationController
           f.options[:yAxis][:max]=median_money.max * 2
         end
         f.options[:xAxis][:categories] = (@simulation.starting_age..@simulation.last_simulation_age).to_a
-        for i in 0..(@simulation.paths.count-1)
-          puts "path #{i} ~~~~~~~~~~~~~~~~~~~~~~"
-          puts money[i]
-          f.series(:type=> 'spline', :name=>"path #{i}", :data=> money[i],:showInLegend=>false, :enableMouseTracking=>false, :color=>'#CCCCCC')
-        end
+        # for i in 0..(@simulation.paths.count-1)
+        #   puts "path #{i} ~~~~~~~~~~~~~~~~~~~~~~"
+        #   puts money[i]
+        #   f.series(:type=> 'spline', :name=>"path #{i}", :data=> money[i],:showInLegend=>false, :enableMouseTracking=>false, :color=>'#CCCCCC')
+        # end
+        f.series(:type=> 'area', :name=>'Possible Outcomes', :data=> percentile_up95, :showInLegend=>false, :enableMouseTracking=>true, :color=>'#CCCCCC')
         f.series(:type=> 'spline', :name=>'90th Percentile', :data=> percentile_up90,:showInLegend=>true, :enableMouseTracking=>true)
         f.series(:type=> 'spline', :name=>'75th Percentile', :data=> percentile_up50,:showInLegend=>true, :enableMouseTracking=>true)
         f.series(:type=> 'spline', :name=>'Median Portfolio', :data=> median_money,:showInLegend=>true, :enableMouseTracking=>true)
@@ -173,17 +203,19 @@ class SimulationsController < ApplicationController
         }
       end
 
-  #     @assetreturnchart = LazyHighCharts::HighChart.new('column') do |f|
-  #       f.title({ :text=>'Asset Return Histogram'})
-  #       f.options[:chart][:defaultSeriesType] = "column"
-  #       f.yAxis({title: {text: "Frequency", margin: 10}})
-  #       f.xAxis({title: {text: "Return Rate", margin: 10}})
+      @assetreturnchart = LazyHighCharts::HighChart.new('column') do |f|
+        f.title({ :text=>'Asset Return Histogram'})
+        f.options[:chart][:defaultSeriesType] = "column"
+        f.yAxis({title: {text: "Frequency", margin: 10}})
+        f.xAxis({title: {text: "Return Rate", margin: 10}})
 
-  #       f.options[:xAxis][:categories] = (@simulation.starting_age..@simulation.last_simulation_age).to_a
-  #       asset_types_map.each { |key,value|
-  #         f.series(:type=> 'spline', :name=>value[:name], :data=> mean_asset_returns[value[:order]],:showInLegend=>true, :enableMouseTracking=>true)
-  #       }
-  #     end
+        f.options[:xAxis][:categories] = asset_return_axis
+        asset_types_map.each { |key,value|
+          Rails.logger.debug ' asset histogram ~~~~'
+          Rails.logger.debug asset_return_histogram[value[:order]]
+          f.series(:type=> 'column', :name=>value[:name], :data=> asset_return_histogram[value[:order]],:showInLegend=>true, :enableMouseTracking=>true)
+        }
+      end
 
   #     f.series(:name=>'Incorrect',:data=> [10, 2, 3, 1, 4]) 
   # f.options[:xAxis] = {:plot_bands => "none", :categories => ["1.1.2011", "2.1.2011"]}

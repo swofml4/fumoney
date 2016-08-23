@@ -24,6 +24,11 @@ Highcharts.theme = {
                 enabled: false
             }
         }
+        area: {
+            marker: {
+                enabled: false
+            }
+        }
     },
 	title: {
 		style: {

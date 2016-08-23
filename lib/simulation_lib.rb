@@ -5,21 +5,21 @@ module SimulationLib
     asset_count = asset_types_map.length
     #we default matrix to 1, as diagonals will not be explicitly defined (they are always 1)
     #if a correlation isnt defined, we assume a correlation of 1
-    correlation_matrix = Matrix.build(asset_count, asset_count) { 1.00 }
+    correlation_matrix = Matrix.build(asset_count, asset_count) { Float(1.0) }
     #overriding matrix [] being private. I get they have reasons, but for my use, so stupid
     current_simulation.correlation_collection.correlations.each do |correlation|
       if current_simulation.starting_assets.exists?(:asset_type_id => correlation.asset_type1_id) and
           current_simulation.starting_assets.exists?(:asset_type_id => correlation.asset_type2_id)
 
         correlation_matrix.send(:[]=,asset_types_map[correlation.asset_type1_id][:order], 
-          asset_types_map[correlation.asset_type2_id][:order], (correlation.correlation_amount / 100.00).round(2))
+          asset_types_map[correlation.asset_type2_id][:order], (correlation.correlation_amount / 100.00).round(2).to_s.to_f)
         correlation_matrix.send(:[]=,asset_types_map[correlation.asset_type2_id][:order], 
-          asset_types_map[correlation.asset_type1_id][:order], (correlation.correlation_amount / 100.00).round(2))
+          asset_types_map[correlation.asset_type1_id][:order], (correlation.correlation_amount / 100.00).round(2).to_s.to_f)
       end
     end
-    #puts 'correlation built~~~~~~~~~~~~'
-    #puts correlation_matrix.inspect
-    #puts 'end correlation matrix ~~~~~~'
+    Rails.logger.debug 'correlation built~~~~~~~~~~~~'
+    Rails.logger.debug correlation_matrix.inspect
+    Rails.logger.debug 'end correlation matrix ~~~~~~'
     return correlation_matrix
   end
 
@@ -27,13 +27,13 @@ module SimulationLib
 
     #correlate the random results
     arr_transposed = asset_returns_raw.transpose
-    #puts 'can transpose'
+    Rails.logger.debug 'can transpose'
     arc = (v_sqrt_d_eigens * arr_transposed).round(18)
-    #puts 'can mult'
+    Rails.logger.debug 'can mult'
     asset_returns_correlated = arc.transpose
-    #puts 'can transpose again'
+    Rails.logger.debug 'can transpose again'
     #asset_returns_correlated = (v_sqrt_d_eigens * asset_returns_raw.transpose).transpose
-    #puts 'transposed'
+    Rails.logger.debug 'transposed'
     #sigma mu shift results
     sigma_shift = Matrix.build(correlation_matrix.row_count,correlation_matrix.row_count) {0.00}
     for i in 0..(v_sqrt_d_eigens.row_count-1)
@@ -55,7 +55,7 @@ module SimulationLib
     #start with a collection of standard normal numbers with mu of 0 and sigma of 1
     #this allows shaping of the results by asset correlations
     #after adjusted for correlations, we will adjust the sigma and mu
-    #puts '~~~~~~start path'
+    Rails.logger.debug '~~~~~~start path'
     gen = Rubystats::NormalDistribution.new(0,1)
     asset_types = AssetType.all
     
