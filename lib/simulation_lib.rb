@@ -94,7 +94,7 @@ module SimulationLib
         current_asset = current_portfolio.path_assets.new(:starting_amount => asset.ending_amount, 
           :asset_type_id => asset.asset_type_id)
         current_asset.return_amount = current_asset.starting_amount * asset_returns[asset_types_map[asset.asset_type_id][:order]] - current_asset.starting_amount
-        current_asset.return_rate = asset_returns[asset_types_map[asset.asset_type_id][:order]]
+        current_asset.return_rate = asset_returns[asset_types_map[asset.asset_type_id][:order]] - 1
         portfolio_return_value += current_asset.return_amount + current_asset.starting_amount
       end
 

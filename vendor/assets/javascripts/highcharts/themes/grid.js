@@ -23,7 +23,7 @@ Highcharts.theme = {
             marker: {
                 enabled: false
             }
-        }
+        },
         area: {
             marker: {
                 enabled: false
